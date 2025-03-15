@@ -8,6 +8,13 @@ class MLP:
         self.b2 = np.random.randn(2, 1) * 0.1
         self.w3 = np.random.randn(1, 2) * 0.1
         self.b3 = np.random.randn(1, 1) * 0.1
+    def afficher_parametres(self):
+        print(f"w1 = \n{self.w1}\n")
+        print(f"b1 = \n{self.b1}\n")
+        print(f"w2 = \n{self.b1}\n")
+        print(f"b2 = \n{self.b1}\n")
+        print(f"w3 = \n{self.b1}\n")
+        print(f"b3 = \n{self.b1}\n")
     def sigmoid(self,x):
         return 1 / (1 + np.exp(-x))
 
@@ -20,15 +27,9 @@ class MLP:
         self.s = self.sigmoid(self.c3)
         
         return self.s 
-    def afficher_parametres(self):
-        print(f"w1 = \n{self.w1}\n")
-        print(f"b1 = \n{self.b1}\n")
-        print(f"w2 = \n{self.b1}\n")
-        print(f"b2 = \n{self.b1}\n")
-        print(f"w3 = \n{self.b1}\n")
-        print(f"b3 = \n{self.b1}\n")
-       
-
+    
+    def retropropagation(self):
+        s=
 reseau = MLP()
 reseau.afficher_parametres()
 vars = np.array([[0.5], [0.2], [-0.3]])
