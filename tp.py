@@ -30,7 +30,7 @@ class MLP:
         self.s2 = self.sigmoid(self.c2)#matrice 2*1
         self.c3 = np.dot(self.w3, self.s2) + self.b3
         self.s = self.sigmoid(self.c3)
-        
+
         return self.s 
     
     def retropropagation(self,vars):
@@ -39,11 +39,11 @@ class MLP:
 
 reseau = MLP()
 reseau.afficher_parametres()
-vals = np.array([[0.5], [0.2], [-0.3]])#decalaration des variable (les entrées 3 )
+#vals = np.array([[0.5], [0.2], [-0.3]])#decalaration des variable (les entrées 3 )
 sortie_finale = reseau.propa_vers_avant(vars)
 print(f"sortie finale du réseau :\n{sortie_finale}")
 
-vals_entrai=np.array([[0.5, 0.2, -0.3],[0.1, 0.6, 0.7],[0.2, -0.1, 0.9]])
+vals=np.array([[0.5, 0.2, -0.3],[0.1, 0.6, 0.7],[0.2, -0.1, 0.9]])
 s_entrai=np.array([[1], [0], [1]])
 
 
