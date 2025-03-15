@@ -21,9 +21,10 @@ class MLP:
         print(f"b3 = \n{self.b1}\n")
     def sigmoid(self,x):
         return 1 / (1 + np.exp(-x))
-
-    def propa_vers_avant(self, vars):
-        self.c1 = np.dot(self.w1, vars) + self.b1
+    def df_sigmoid(self, x):
+        return x * (1 - x)
+    def propa_vers_avant(self, vals):
+        self.c1 = np.dot(self.w1, vals) + self.b1
         self.s1 = self.sigmoid(self.c1)#matrice 3*1
         self.c2 = np.dot(self.w2, self.s1) + self.b2
         self.s2 = self.sigmoid(self.c2)#matrice 2*1
@@ -34,13 +35,16 @@ class MLP:
     
     def retropropagation(self,vars):
         sc=self.propa_vers_avant(vars)
-        
+        erreur=s_entrai-sc
+
 reseau = MLP()
 reseau.afficher_parametres()
-vars = np.array([[0.5], [0.2], [-0.3]])#decalaration des variable (les entrées 3 )
+vals = np.array([[0.5], [0.2], [-0.3]])#decalaration des variable (les entrées 3 )
 sortie_finale = reseau.propa_vers_avant(vars)
 print(f"sortie finale du réseau :\n{sortie_finale}")
 
+vals_entrai=np.array([[0.5, 0.2, -0.3],[0.1, 0.6, 0.7],[0.2, -0.1, 0.9]])
+s_entrai=np.array([[1], [0], [1]])
 
 
 
