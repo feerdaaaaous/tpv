@@ -15,10 +15,10 @@ class MLP:
     def afficher_parametres(self):
         print(f"w1 = \n{self.w1}\n")
         print(f"b1 = \n{self.b1}\n")
-        print(f"w2 = \n{self.b1}\n")
-        print(f"b2 = \n{self.b1}\n")
-        print(f"w3 = \n{self.b1}\n")
-        print(f"b3 = \n{self.b1}\n")
+        print(f"w2 = \n{self.w2}\n")
+        print(f"b2 = \n{self.b2}\n")
+        print(f"w3 = \n{self.w3}\n")
+        print(f"b3 = \n{self.b3}\n")
     def sigmoid(self,x):
         return 1 / (1 + np.exp(-x))
     def df_sigmoid(self, x):
@@ -33,18 +33,37 @@ class MLP:
 
         return self.s 
     
-    def retropropagation(self,vars):
+"""   def retropropagation(self,vars):
         sc=self.propa_vers_avant(vars)
         erreur=s_entrai-sc
+"""
 
 reseau = MLP()
 reseau.afficher_parametres()
-#vals = np.array([[0.5], [0.2], [-0.3]])#decalaration des variable (les entrées 3 )
-sortie_finale = reseau.propa_vers_avant(vars)
+vals = np.array([[0.5], [0.2], [-0.3]])#decalaration des variable (les entrées 3 )
+sortie_finale = reseau.propa_vers_avant(vals)
 print(f"sortie finale du réseau :\n{sortie_finale}")
 
-vals=np.array([[0.5, 0.2, -0.3],[0.1, 0.6, 0.7],[0.2, -0.1, 0.9]])
-s_entrai=np.array([[1], [0], [1]])
+
+with open ("data.txt","r") as file:
+    lignes=file.readlines()
+x=[]
+sx=[]
+for l in lignes:
+    val = list(map(float,l.split()))
+    x.append(val[:-1])
+    sx.append(val[-1])
+
+x=np.array(x)
+sx=np.array(sx)
+print("exemples :",x[:5])
+print("sortie :",sx[:5])
+
+
+
+
+
+
 
 
 
