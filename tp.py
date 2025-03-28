@@ -4,6 +4,7 @@ np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is
 
 class MLP:
     def __init__(self):
+        self.alpha=0.1
         #multipe *0,1 pour eviter que le fonctions d'activation devient presque 0 (eviter les poids  trop grands ou trop petit)
         self.w1 = np.random.randn(3, 3) * 0.1
         self.b1 = np.random.randn(3, 1) * 0.1  
@@ -34,10 +35,33 @@ class MLP:
         self.s = self.sigmoid(self.c3)
 
         return self.s 
-    
-    def retropropagation(self,vars):
-       
+    def retropropagation(self,x,s_reel,s_calculer):
+        error=s_reel-s_calculer
+     #calcule des gradients et miss a jour les poids entre la couche sortie et la couche cachee2
+        delta_s=error*self.df_sigmoid(s_calculer)
+        delta_w3=np.dot(delta_s,self.s2.T) #.T is for converts the 2,1 vector to 1,2 row vector 
+        delta_b3=delta_s
 
+        self.w3+=self.alpha*delta_w3
+        self.b3+=self.alpha*delta_b3
+     #calcule des gradients et miss a jour les poids entre la couche cachee2 et la couche cachee1
+        delta_s2=np.dot(self.w3.T,delta_s)*self.df_sigmoid(self.s2)
+        delta_w2=np.dot(delta_s2,self.s1.T)
+        delta_b2=delta_s2
+
+        self.w2+=self.alpha*delta_w2
+        self.b2+=self.alpha*delta_b2
+     #calcule des gradients et miss a jour les poids entre la couche cachee1 et lentree
+        delta_s1=np.dot(self.w2.T,delta_s2)*self.df_sigmoid(self.s1)
+        delta_w1=np.dot(delta_s1,x.T)
+        delta_b1=delta_s1
+        
+        self.w1+=self.alpha*delta_w1
+        self.b1+=self.alpha*delta_b1
+    
+
+        
+   
         
 
 reseau = MLP()
@@ -73,12 +97,18 @@ for _ in range (maxiter):
     nbr_x=np.arange(len(x))
     np.random.shuffle(nbr_x)
     x=x[nbr_x]
-    srx=[nbr_x]
+    srx=srx[nbr_x]
     scx=[scx[i] for i in nbr_x]
     for i,exemple in enumerate(x):
         xcolumn=np.array(exemple).reshape(-1,1)
         reseau.retropropagation(xcolumn,srx[i],scx[i])
-
+print("apres entrainement ")
+for i,exemple in enumerate(x):
+    xcolumn=np.array(exemple).reshape(-1,1)
+    sortie=reseau.propa_vers_avant(xcolumn)
+    print(f"\n exemple {i+1} => {exemple}")
+    print(f"sortie attendue = {srx[i]}")
+    print(f"sortie calcule = {sortie}")
 
 
 
