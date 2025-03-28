@@ -1,5 +1,5 @@
 import numpy as np
-
+np.set_printoptions(threshold=np.inf,precision=20, floatmode='maxprec', suppress=True)
 class MLP:
     def __init__(self):
         #multipe *0,1 pour eviter que le fonctions d'activation devient presque 0 (eviter les poids  trop grands ou trop petit)
@@ -56,8 +56,8 @@ for l in lignes:
 
 x=np.array(x)
 sx=np.array(sx)
-print("exemples :",x[:5])
-print("sortie :",sx[:5])
+print("exemples :",x)
+print("sortie :",sx)
 
 
 
