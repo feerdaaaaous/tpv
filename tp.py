@@ -35,26 +35,28 @@ class MLP:
 
         return self.s 
     
-"""   def retropropagation(self,vars):
-        sc=self.propa_vers_avant(vars)
-        erreur=s_entrai-sc
-"""
+    def retropropagation(self,vars):
+       
+
+        
 
 reseau = MLP()
 reseau.afficher_parametres()
-#reading the file 
+
+#chargement des données
 x=[]
 srx=[]
 with open ("data.txt","r") as file:
    for l in file:
       l=l.strip()
       if l:
-       val =[float (num) for num in l.split()]# reading the full number
+       val =[float (num) for num in l.split()]# reading each entrees 
        x.append(val[:-1])
        srx.append(val[-1])
 
 x=np.array(x,dtype=np.float64)
 srx=np.array(srx)
+
 #application de la fonction propagation avant 
 scx=[]
 for i,exemple in enumerate(x):
@@ -64,6 +66,18 @@ for i,exemple in enumerate(x):
     print(f"\n exemple {i+1} => {exemple}")
     print(f"sortie attendue = {srx[i]}")
     print(f"sortie calcule = {sortie}")
+#application de la fonction backpropagation 
+epsilon=0.001
+maxiter=100
+for _ in range (maxiter):
+    nbr_x=np.arange(len(x))
+    np.random.shuffle(nbr_x)
+    x=x[nbr_x]
+    srx=[nbr_x]
+    scx=[scx[i] for i in nbr_x]
+    for i,exemple in enumerate(x):
+        xcolumn=np.array(exemple).reshape(-1,1)
+        reseau.retropropagation(xcolumn,srx[i],scx[i])
 
 
 
