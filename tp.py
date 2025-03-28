@@ -1,5 +1,7 @@
 import numpy as np
-np.set_printoptions(threshold=np.inf,precision=20, floatmode='maxprec', suppress=True)
+np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is for display the data full float numbers
+
+
 class MLP:
     def __init__(self):
         #multipe *0,1 pour eviter que le fonctions d'activation devient presque 0 (eviter les poids  trop grands ou trop petit)
@@ -40,24 +42,33 @@ class MLP:
 
 reseau = MLP()
 reseau.afficher_parametres()
-vals = np.array([[0.5], [0.2], [-0.3]])#decalaration des variable (les entrées 3 )
-sortie_finale = reseau.propa_vers_avant(vals)
-print(f"sortie finale du réseau :\n{sortie_finale}")
-
-
-with open ("data.txt","r") as file:
-    lignes=file.readlines()
+#reading the file 
 x=[]
-sx=[]
-for l in lignes:
-    val = list(map(float,l.split()))
-    x.append(val[:-1])
-    sx.append(val[-1])
+srx=[]
+with open ("data.txt","r") as file:
+   for l in file:
+      l=l.strip()
+      if l:
+       val =[float (num) for num in l.split()]# reading the full number
+       x.append(val[:-1])
+       srx.append(val[-1])
 
-x=np.array(x)
-sx=np.array(sx)
-print("exemples :",x)
-print("sortie :",sx)
+x=np.array(x,dtype=np.float64)
+srx=np.array(srx)
+#application de la fonction propagation avant 
+scx=[]
+for i,exemple in enumerate(x):
+    xcolumn=np.array(exemple).reshape(-1,1)#convertir to column vector 
+    sortie=reseau.propa_vers_avant(xcolumn)
+    scx.append(sortie)
+    print(f"\n exemple {i+1} => {exemple}")
+    print(f"sortie attendue = {srx[i]}")
+    print(f"sortie calcule = {sortie}")
+
+
+
+
+
 
 
 
