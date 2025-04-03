@@ -58,11 +58,6 @@ class MLP:
         
         self.w1+=self.alpha*delta_w1
         self.b1+=self.alpha*delta_b1
-    
-
-        
-   
-        
 
 reseau = MLP()
 reseau.afficher_parametres()
