@@ -15,6 +15,7 @@ class MLP:
         self.w3 = np.random.randn(1, 2) * 0.1
         self.b3 = np.random.randn(1, 1) * 0.1
         #entre la couche cachée2 et sortie ( 1 neurones )
+
     def afficher_parametres(self):
         print(f"w1 = \n{self.w1}\n")
         print(f"b1 = \n{self.b1}\n")
@@ -22,10 +23,12 @@ class MLP:
         print(f"b2 = \n{self.b2}\n")
         print(f"w3 = \n{self.w3}\n")
         print(f"b3 = \n{self.b3}\n")
+
     def sigmoid(self,x):
         return 1 / (1 + np.exp(-x))
     def df_sigmoid(self, x):
         return x * (1 - x)
+    
     def propa_vers_avant(self, vals):
         self.c1 = np.dot(self.w1, vals) + self.b1
         self.s1 = self.sigmoid(self.c1)#matrice 3*1
@@ -35,6 +38,7 @@ class MLP:
         self.s = self.sigmoid(self.c3)
 
         return self.s 
+    
     def retropropagation(self,x,s_reel,s_calculer):
         error=s_reel-s_calculer
      #calcule des gradients et miss a jour les poids entre la couche sortie et la couche cachee2
@@ -58,6 +62,34 @@ class MLP:
         
         self.w1+=self.alpha*delta_w1
         self.b1+=self.alpha*delta_b1
+
+    def entrainement(reseau,x,srx,scx,maxiter=2,epsilon=1e-6):
+        last_error=100 #start with a large nbr of error 
+        for _ in range (maxiter):
+            total_error=0
+            nbr_x=np.arange(len(x))
+            np.random.shuffle(nbr_x)
+            x=x[nbr_x]
+            srx=srx[nbr_x]
+            scx=[scx[i] for i in nbr_x]
+            for i,exemple in enumerate(x):
+                xcolumn=np.array(exemple).reshape(-1,1)
+                reseau.retropropagation(xcolumn,srx[i],scx[i])
+                sortie_apres = reseau.propa_vers_avant(xcolumn)
+
+                exemple_error=np.sum(np.abs(srx[i]-sortie_apres))
+                total_error+=exemple_error
+                print(f"\nexemple {i+1} => {exemple}")
+                print(f"sortie attendue = {srx[i]}")
+                print(f"sortie avant entraînement = {scx[i]}")  # scx[i] was the output before training
+                print(f"sortie après entraînement = {sortie_apres}")
+            if last_error-total_error<epsilon:
+                print(f"stopping earrly at iteration {_+1} with error = {total_error}")
+                break
+            last_error=total_error
+            print(f"iteration {_+1} total error = {total_error}")
+       
+
 
 reseau = MLP()
 reseau.afficher_parametres()
@@ -85,6 +117,17 @@ for i,exemple in enumerate(x):
     print(f"\n exemple {i+1} => {exemple}")
     print(f"sortie attendue = {srx[i]}")
     print(f"sortie calcule = {sortie}")
+
+reseau.entrainement(x,srx,scx)
+
+
+
+
+
+
+
+
+"""
 #application de la fonction backpropagation 
 epsilon=0.001
 maxiter=100
@@ -97,6 +140,7 @@ for _ in range (maxiter):
     for i,exemple in enumerate(x):
         xcolumn=np.array(exemple).reshape(-1,1)
         reseau.retropropagation(xcolumn,srx[i],scx[i])
+
 print("apres entrainement ")
 for i,exemple in enumerate(x):
     xcolumn=np.array(exemple).reshape(-1,1)
@@ -105,9 +149,7 @@ for i,exemple in enumerate(x):
     print(f"sortie attendue = {srx[i]}")
     print(f"sortie calcule = {sortie}")
 
-
-
-
+"""
 
 
 
