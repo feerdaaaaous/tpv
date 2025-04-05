@@ -4,7 +4,7 @@ np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is
 
 class MLP:
     def __init__(self):
-        self.alpha=0.01
+        self.alpha=0.1
         #change to xavier initialization pour maintenir la meme variance des activation entre les diff couches 
         self.w1 = np.random.randn(3, 3) * np.sqrt(2. / (3 + 3)) # 3+3 mean 3 entree et 3 couche c1 
         self.b1 = np.zeros((3, 1))
@@ -39,29 +39,38 @@ class MLP:
 
         return self.s 
     
-    def retropropagation(self,x,s_reel,s_calculer):
-        error=s_reel-s_calculer
-     #calcule des gradients et miss a jour les poids entre la couche sortie et la couche cachee2
-        delta_s=error*self.df_sigmoid(s_calculer)
-        delta_w3=np.dot(delta_s,self.s2.T) #.T is for converts the 2,1 vector to 1,2 row vector 
-        delta_b3=delta_s
+    def retropropagation(self,x,s_reel,s_calculer,epsilon=1e-6,iteration=5):
+        i=0
+        while True:
+            error=s_reel-s_calculer
+            #calcule des gradients et miss a jour les poids entre la couche sortie et la couche cachee2
+            delta_s=error*self.df_sigmoid(s_calculer)
+            delta_w3=np.dot(delta_s,self.s2.T) #.T is for converts the 2,1 vector to 1,2 row vector 
+            delta_b3=delta_s
 
-        self.w3+=self.alpha*delta_w3
-        self.b3+=self.alpha*delta_b3
-     #calcule des gradients et miss a jour les poids entre la couche cachee2 et la couche cachee1
-        delta_s2=np.dot(self.w3.T,delta_s)*self.df_sigmoid(self.s2)
-        delta_w2=np.dot(delta_s2,self.s1.T)
-        delta_b2=delta_s2
+            self.w3+=self.alpha*delta_w3
+            self.b3+=self.alpha*delta_b3
+            #calcule des gradients et miss a jour les poids entre la couche cachee2 et la couche cachee1
+            delta_s2=np.dot(self.w3.T,delta_s)*self.df_sigmoid(self.s2)
+            delta_w2=np.dot(delta_s2,self.s1.T)
+            delta_b2=delta_s2
 
-        self.w2+=self.alpha*delta_w2
-        self.b2+=self.alpha*delta_b2
-     #calcule des gradients et miss a jour les poids entre la couche cachee1 et lentree
-        delta_s1=np.dot(self.w2.T,delta_s2)*self.df_sigmoid(self.s1)
-        delta_w1=np.dot(delta_s1,x.T)
-        delta_b1=delta_s1
+            self.w2+=self.alpha*delta_w2
+            self.b2+=self.alpha*delta_b2
+            #calcule des gradients et miss a jour les poids entre la couche cachee1 et lentree
+            delta_s1=np.dot(self.w2.T,delta_s2)*self.df_sigmoid(self.s1)
+            delta_w1=np.dot(delta_s1,x.T)
+            delta_b1=delta_s1
         
-        self.w1+=self.alpha*delta_w1
-        self.b1+=self.alpha*delta_b1
+            self.w1+=self.alpha*delta_w1
+            self.b1+=self.alpha*delta_b1
+            s_nouveau=self.propa_vers_avant(x)
+            error=np.sum(np.abs(s_nouveau-s_calculer))
+            iteration+=1
+            if error<epsilon or i >= iteration:
+                break
+            s_calculer=s_nouveau
+        return s_calculer
 
     def entrainement(self,reseau,x,srx,maxiter=2,epsilon=1e-6):
         last_error=float('inf') #start with a large nbr of error 
@@ -71,12 +80,10 @@ class MLP:
             np.random.shuffle(nbr_x)
             x=x[nbr_x]
             srx=srx[nbr_x]
-            for i,exemple in enumerate(x):
-                xcolumn=np.array(exemple).reshape(-1,1)
-                sortie_avant=reseau.propa_vers_avant(xcolumn)#for affichage 
-                reseau.retropropagation(xcolumn,srx[i],reseau.propa_vers_avant(xcolumn))
-                sortie_apres = reseau.propa_vers_avant(xcolumn)
-
+            xcolumn=np.array(x).reshape(-1,1)
+            sortie_avant=reseau.propa_vers_avant(xcolumn)#for affichage 
+            for i,exemple in enumerate(xcolumn):
+                sortie_apres=reseau.retropropagation(xcolumn,srx[i],reseau.propa_vers_avant(xcolumn))
                 exemple_error=np.sum(np.abs(srx[i]-sortie_apres))
                 total_error+=exemple_error
                 print(f"\nexemple {i+1} => {exemple}")
