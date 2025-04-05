@@ -65,14 +65,15 @@ class MLP:
             self.w1+=self.alpha*delta_w1
             self.b1+=self.alpha*delta_b1
             s_nouveau=self.propa_vers_avant(x)
-            error=np.sum(np.abs(s_nouveau-s_calculer))
-            iteration+=1
-            if error<epsilon or i >= iteration:
+            error=np.sum(np.abs(s_nouveau-s_reel))
+            i+=1
+            if error<epsilon :
+                print(f"exemple end in iteration{i+1}")
                 break
             s_calculer=s_nouveau
         return s_calculer
 
-    def entrainement(self,reseau,x,srx,maxiter=2,epsilon=1e-6):
+    def entrainement(self,reseau,x,srx,maxiter=200,epsilon=1e-6):
         last_error=float('inf') #start with a large nbr of error 
         # before training il faut calculer les sortie avant la retropropagation
         sorties_avant=[]
@@ -82,6 +83,7 @@ class MLP:
             sorties_avant.append(sortie)
       
         for _ in range (maxiter):
+            print(f"~~~~~~~~~~~~~~iteration {_+1}~~~~~~~~~~~~~~")
             total_error=0
             nbr_x=np.arange(len(x))
             np.random.shuffle(nbr_x)
@@ -95,7 +97,7 @@ class MLP:
                 sortie_apres=reseau.retropropagation(xcolumn,srxshuffle[i],reseau.propa_vers_avant(xcolumn))
                 exemple_error=np.sum(np.abs(srxshuffle[i]-sortie_apres))
                 total_error+=exemple_error
-                print(f"~~~~~~~~~~~~~~iteration {_+1}~~~~~~~~~~~~~~")
+                
                 print(f"\nexemple {nbr_x[i]} => {exemple}")
                 print(f"sortie attendue = {srxshuffle[i]}")
                 print(f"sortie avant entraînement = {sortie_avant}")  # scx[i] was the output before training
