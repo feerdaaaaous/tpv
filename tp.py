@@ -74,20 +74,30 @@ class MLP:
 
     def entrainement(self,reseau,x,srx,maxiter=2,epsilon=1e-6):
         last_error=float('inf') #start with a large nbr of error 
+        # before training il faut calculer les sortie avant la retropropagation
+        sorties_avant=[]
+        for exemple in x:
+            xcolumn=np.array(exemple).reshape(-1,1)
+            sortie=reseau.propa_vers_avant(xcolumn)
+            sorties_avant.append(sortie)
+      
         for _ in range (maxiter):
             total_error=0
             nbr_x=np.arange(len(x))
             np.random.shuffle(nbr_x)
-            x=x[nbr_x]
-            srx=srx[nbr_x]
-            xcolumn=np.array(x).reshape(-1,1)
-            sortie_avant=reseau.propa_vers_avant(xcolumn)#for affichage 
-            for i,exemple in enumerate(xcolumn):
-                sortie_apres=reseau.retropropagation(xcolumn,srx[i],reseau.propa_vers_avant(xcolumn))
-                exemple_error=np.sum(np.abs(srx[i]-sortie_apres))
+            
+            xshuffle=x[nbr_x]
+            srxshuffle=srx[nbr_x]
+            sortie_avantshuffle= [sorties_avant[i] for i in nbr_x]
+            for i,exemple in enumerate(xshuffle):
+                xcolumn=np.array(exemple).reshape(-1,1)
+                sortie_avant=sortie_avantshuffle[i]
+                sortie_apres=reseau.retropropagation(xcolumn,srxshuffle[i],reseau.propa_vers_avant(xcolumn))
+                exemple_error=np.sum(np.abs(srxshuffle[i]-sortie_apres))
                 total_error+=exemple_error
-                print(f"\nexemple {i+1} => {exemple}")
-                print(f"sortie attendue = {srx[i]}")
+                print(f"~~~~~~~~~~~~~~iteration {_+1}~~~~~~~~~~~~~~")
+                print(f"\nexemple {nbr_x[i]} => {exemple}")
+                print(f"sortie attendue = {srxshuffle[i]}")
                 print(f"sortie avant entraînement = {sortie_avant}")  # scx[i] was the output before training
                 print(f"sortie après entraînement = {sortie_apres}")
             if abs(last_error-total_error)<epsilon:
