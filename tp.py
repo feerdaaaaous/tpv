@@ -4,7 +4,7 @@ np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is
 
 class MLP:
     def __init__(self):
-        self.alpha=0.1
+        self.alpha=0.01
         #multipe *0,1 pour eviter que le fonctions d'activation devient presque 0 (eviter les poids  trop grands ou trop petit)
         self.w1 = np.random.randn(3, 3) * 0.1
         self.b1 = np.random.randn(3, 1) * 0.1  
