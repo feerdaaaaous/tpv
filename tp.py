@@ -5,15 +5,15 @@ np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is
 class MLP:
     def __init__(self):
         self.alpha=0.01
-        #multipe *0,1 pour eviter que le fonctions d'activation devient presque 0 (eviter les poids  trop grands ou trop petit)
-        self.w1 = np.random.randn(3, 3) * 0.1
-        self.b1 = np.random.randn(3, 1) * 0.1  
+        #change to xavier initialization pour maintenir la meme variance des activation entre les diff couches 
+        self.w1 = np.random.randn(3, 3) * np.sqrt(2. / (3 + 3)) # 3+3 mean 3 entree et 3 couche c1 
+        self.b1 = np.zeros((3, 1))
         # w1 et b1 est les poids et biais (couche entree  3 neurones)
-        self.w2 = np.random.randn(2, 3) * 0.1
-        self.b2 = np.random.randn(2, 1) * 0.1
+        self.w2 = np.random.randn(2, 3) * np.sqrt(2. / (3 + 2))#3+2 mean 3 couche c1 et 2 couche c2 
+        self.b2 = np.zeros((2, 1))
         #entre la couch cachée1 (3neurones )et cachée2(2 neurones)
-        self.w3 = np.random.randn(1, 2) * 0.1
-        self.b3 = np.random.randn(1, 1) * 0.1
+        self.w3 = np.random.randn(1, 2) * np.sqrt(2. / (2 + 1))#2+1 mean 2 for couche c2 et la couche sortie 1 
+        self.b3 = np.zeros((1, 1))
         #entre la couche cachée2 et sortie ( 1 neurones )
 
     def afficher_parametres(self):
@@ -63,27 +63,27 @@ class MLP:
         self.w1+=self.alpha*delta_w1
         self.b1+=self.alpha*delta_b1
 
-    def entrainement(reseau,x,srx,scx,maxiter=2,epsilon=1e-6):
-        last_error=100 #start with a large nbr of error 
+    def entrainement(self,reseau,x,srx,maxiter=2,epsilon=1e-6):
+        last_error=float('inf') #start with a large nbr of error 
         for _ in range (maxiter):
             total_error=0
             nbr_x=np.arange(len(x))
             np.random.shuffle(nbr_x)
             x=x[nbr_x]
             srx=srx[nbr_x]
-            scx=[scx[i] for i in nbr_x]
             for i,exemple in enumerate(x):
                 xcolumn=np.array(exemple).reshape(-1,1)
-                reseau.retropropagation(xcolumn,srx[i],scx[i])
+                sortie_avant=reseau.propa_vers_avant(xcolumn)#for affichage 
+                reseau.retropropagation(xcolumn,srx[i],reseau.propa_vers_avant(xcolumn))
                 sortie_apres = reseau.propa_vers_avant(xcolumn)
 
                 exemple_error=np.sum(np.abs(srx[i]-sortie_apres))
                 total_error+=exemple_error
                 print(f"\nexemple {i+1} => {exemple}")
                 print(f"sortie attendue = {srx[i]}")
-                print(f"sortie avant entraînement = {scx[i]}")  # scx[i] was the output before training
+                print(f"sortie avant entraînement = {sortie_avant}")  # scx[i] was the output before training
                 print(f"sortie après entraînement = {sortie_apres}")
-            if last_error-total_error<epsilon:
+            if abs(last_error-total_error)<epsilon:
                 print(f"stopping earrly at iteration {_+1} with error = {total_error}")
                 break
             last_error=total_error
@@ -107,7 +107,8 @@ with open ("data.txt","r") as file:
 
 x=np.array(x,dtype=np.float64)
 srx=np.array(srx)
-
+reseau.entrainement(reseau,x,srx)
+"""
 #application de la fonction propagation avant 
 scx=[]
 for i,exemple in enumerate(x):
@@ -117,8 +118,8 @@ for i,exemple in enumerate(x):
     print(f"\n exemple {i+1} => {exemple}")
     print(f"sortie attendue = {srx[i]}")
     print(f"sortie calcule = {sortie}")
+"""
 
-reseau.entrainement(x,srx,scx)
 
 
 
