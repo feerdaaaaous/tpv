@@ -4,7 +4,7 @@ np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is
 
 class MLP:
     def __init__(self):
-        self.alpha=0.1
+        self.alpha=0.001
         #change to xavier initialization pour maintenir la meme variance des activation entre les diff couches 
         self.w1 = np.random.randn(3, 3) * np.sqrt(2. / (3 + 3)) # 3+3 mean 3 entree et 3 couche c1 
         self.b1 = np.zeros((3, 1))
@@ -41,10 +41,10 @@ class MLP:
     
     def retropropagation(self,x,s_reel,s_calculer,epsilon=1e-6,iteration=5):
         i=0
+        
         while True:
-            error=s_reel-s_calculer
             #calcule des gradients et miss a jour les poids entre la couche sortie et la couche cachee2
-            delta_s=error*self.df_sigmoid(s_calculer)
+            delta_s=(s_calculer - s_reel)*self.df_sigmoid(s_calculer)
             delta_w3=np.dot(delta_s,self.s2.T) #.T is for converts the 2,1 vector to 1,2 row vector 
             delta_b3=delta_s
 
@@ -64,16 +64,16 @@ class MLP:
         
             self.w1+=self.alpha*delta_w1
             self.b1+=self.alpha*delta_b1
-            s_nouveau=self.propa_vers_avant(x)
-            error=np.sum(np.abs(s_nouveau-s_reel))
+            s_calculer=self.propa_vers_avant(x)
+            error=np.mean(np.square(s_reel - s_calculer))
             i+=1
-            if error<epsilon :
+            if error < epsilon or i>=iteration :
                 print(f"exemple end in iteration{i+1}")
                 break
-            s_calculer=s_nouveau
+            
         return s_calculer
 
-    def entrainement(self,reseau,x,srx,maxiter=200,epsilon=1e-6):
+    def entrainement(self,reseau,x,srx,maxiter=2,epsilon=1e-6):
         last_error=float('inf') #start with a large nbr of error 
         # before training il faut calculer les sortie avant la retropropagation
         sorties_avant=[]
@@ -94,7 +94,8 @@ class MLP:
             for i,exemple in enumerate(xshuffle):
                 xcolumn=np.array(exemple).reshape(-1,1)
                 sortie_avant=sortie_avantshuffle[i]
-                sortie_apres=reseau.retropropagation(xcolumn,srxshuffle[i],reseau.propa_vers_avant(xcolumn))
+
+                sortie_apres=reseau.retropropagation(xcolumn,srxshuffle[i],sortie_avant)
                 exemple_error=np.sum(np.abs(srxshuffle[i]-sortie_apres))
                 total_error+=exemple_error
                 
@@ -102,6 +103,7 @@ class MLP:
                 print(f"sortie attendue = {srxshuffle[i]}")
                 print(f"sortie avant entraînement = {sortie_avant}")  # scx[i] was the output before training
                 print(f"sortie après entraînement = {sortie_apres}")
+                
             if abs(last_error-total_error)<epsilon:
                 print(f"stopping earrly at iteration {_+1} with error = {total_error}")
                 break
