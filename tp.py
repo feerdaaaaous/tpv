@@ -94,7 +94,6 @@ class MLP:
             for i,exemple in enumerate(xshuffle):
                 xcolumn=np.array(exemple).reshape(-1,1)
                 sortie_avant=sortie_avantshuffle[i]
-
                 sortie_apres=reseau.retropropagation(xcolumn,srxshuffle[i],sortie_avant)
                 exemple_error=np.sum(np.abs(srxshuffle[i]-sortie_apres))
                 total_error+=exemple_error
