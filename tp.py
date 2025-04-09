@@ -16,6 +16,7 @@ class MLP:
         self.b3 = np.zeros((1, 1))
         #entre la couche cachée2 et sortie ( 1 neurones )
 
+
     def afficher_parametres(self):
         print(f"w1 = \n{self.w1}\n")
         print(f"b1 = \n{self.b1}\n")
