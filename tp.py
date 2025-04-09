@@ -4,15 +4,14 @@ np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is
 
 class MLP:
     def __init__(self):
-        self.alpha=0.001
-        #change to xavier initialization pour maintenir la meme variance des activation entre les diff couches 
-        self.w1 = np.random.randn(3, 3) * np.sqrt(2. / (3 + 3)) # 3+3 mean 3 entree et 3 couche c1 
+        self.alpha=0.5        #change to xavier initialization pour maintenir la meme variance des activation entre les diff couches 
+        self.w1 = np.random.randn(3, 3) 
         self.b1 = np.zeros((3, 1))
         # w1 et b1 est les poids et biais (couche entree  3 neurones)
-        self.w2 = np.random.randn(2, 3) * np.sqrt(2. / (3 + 2))#3+2 mean 3 couche c1 et 2 couche c2 
+        self.w2 = np.random.randn(2, 3) 
         self.b2 = np.zeros((2, 1))
         #entre la couch cachée1 (3neurones )et cachée2(2 neurones)
-        self.w3 = np.random.randn(1, 2) * np.sqrt(2. / (2 + 1))#2+1 mean 2 for couche c2 et la couche sortie 1 
+        self.w3 = np.random.randn(1, 2) 
         self.b3 = np.zeros((1, 1))
         #entre la couche cachée2 et sortie ( 1 neurones )
 
@@ -26,6 +25,7 @@ class MLP:
         print(f"b3 = \n{self.b3}\n")
 
     def sigmoid(self,x):
+        
         return 1 / (1 + np.exp(-x))
     def df_sigmoid(self, x):
         return x * (1 - x)
@@ -40,7 +40,7 @@ class MLP:
 
         return self.s 
     
-    def retropropagation(self,x,s_reel,prediction,iteration=10):
+    def retropropagation(self,x,s_reel,prediction,iteration=100):
         
         
         for i in range(iteration):
