@@ -39,41 +39,49 @@ class MLP:
 
         return self.s 
     
-    def retropropagation(self,x,s_reel,s_calculer,epsilon=1e-6,iteration=5):
-        i=0
+    def retropropagation(self,x,s_reel,prediction,iteration=10):
         
-        while True:
+        
+        for i in range(iteration):
+            s_calculer=self.propa_vers_avant(x)
+            error=np.sum((s_reel-s_calculer)**2)
+
             #calcule des gradients et miss a jour les poids entre la couche sortie et la couche cachee2
             delta_s=(s_calculer - s_reel)*self.df_sigmoid(s_calculer)
             delta_w3=np.dot(delta_s,self.s2.T) #.T is for converts the 2,1 vector to 1,2 row vector 
             delta_b3=delta_s
-
-            self.w3+=self.alpha*delta_w3
-            self.b3+=self.alpha*delta_b3
             #calcule des gradients et miss a jour les poids entre la couche cachee2 et la couche cachee1
             delta_s2=np.dot(self.w3.T,delta_s)*self.df_sigmoid(self.s2)
             delta_w2=np.dot(delta_s2,self.s1.T)
             delta_b2=delta_s2
-
-            self.w2+=self.alpha*delta_w2
-            self.b2+=self.alpha*delta_b2
             #calcule des gradients et miss a jour les poids entre la couche cachee1 et lentree
             delta_s1=np.dot(self.w2.T,delta_s2)*self.df_sigmoid(self.s1)
             delta_w1=np.dot(delta_s1,x.T)
             delta_b1=delta_s1
-        
-            self.w1+=self.alpha*delta_w1
-            self.b1+=self.alpha*delta_b1
+           
+            #miss a jour les poids et biases
+            self.w3-=self.alpha*delta_w3
+            self.b3-=self.alpha*delta_b3
+            self.w2-=self.alpha*delta_w2
+            self.b2-=self.alpha*delta_b2
+            self.w1-=self.alpha*delta_w1
+            self.b1-=self.alpha*delta_b1
+
+            
+            
             s_calculer=self.propa_vers_avant(x)
             error=np.mean(np.square(s_reel - s_calculer))
             i+=1
-            if error < epsilon or i>=iteration :
-                print(f"exemple end in iteration{i+1}")
+            if error < 1e-4:
+                print(f"exemple end early in iteration{i+1}")
                 break
             
-        return s_calculer
-
-    def entrainement(self,reseau,x,srx,maxiter=2,epsilon=1e-6):
+        #return the updated 
+        final_pred=self.propa_vers_avant(x)[0][0]
+        print(f"end with iteration")
+        return prediction,final_pred
+    """
+    def entrainement(self,x,srx,maxiter=10,epsilon=1e-6):
         last_error=float('inf') #start with a large nbr of error 
         # before training il faut calculer les sortie avant la retropropagation
         sorties_avant=[]
@@ -108,26 +116,72 @@ class MLP:
                 break
             last_error=total_error
             print(f"iteration {_+1} total error = {total_error}")
-       
+    """
+    def entrainement(self,x,srx,maxiter=50):
+        predicions_initail={}
+        predictions_courrent={}
+        for i,exemple in enumerate(x):
+            xcolumn = np.array(exemple).reshape(-1, 1)
+            pred = self.propa_vers_avant(xcolumn)[0][0]#we did [0][0]par ce que la sortie est une matrice [[valeur]]
+            predicions_initail[i] = pred
+            predictions_courrent[i] = pred
+        for j in range (maxiter):
+            print(f"~~~~~~~~~~~~~~iteration {j+1}~~~~~~~~~~~~~~")
+            total_error=0
+            #shuffle les exemples
+            nbr_x=np.arange(len(x))
+            np.random.shuffle(nbr_x)
+            for ex in nbr_x:
+                exemple =x[ex]
+                sortie=srx[ex]
 
+                xcolumn=np.array(exemple).reshape(-1,1)
+                pred_before=predictions_courrent[ex]#pour voir le pred before start every iteration ( affichage )
+                _,new_pred=self.retropropagation(xcolumn,sortie,pred,iteration=20)
 
-reseau = MLP()
-reseau.afficher_parametres()
+                predictions_courrent[ex]=new_pred #stocker new prediction de chaque exemple a chaque iteration 
+                #calcule error total 
+                error=abs(sortie-new_pred)
+                total_error+=error
+                #affichage des calcules de chaque exemple 
+                print(f"\nExemple {ex}: {exemple}")
+                print(f"Sortie attendue: {sortie}")
+                print(f"Sortie initiale: {predicions_initail[ex]:.6f}")
+                print(f"Sortie avant mise à jour: {pred_before:.6f}")
+                print(f"Sortie après mise à jour: {new_pred:.6f}")
+            error_moy=total_error/len(x)
+            print(f"\nEpoch {j+1} - Erreur moyenne: {error_moy:.6f}")
 
-#chargement des données
-x=[]
-srx=[]
-with open ("data.txt","r") as file:
-   for l in file:
-      l=l.strip()
-      if l:
-       val =[float (num) for num in l.split()]# reading each entrees 
-       x.append(val[:-1])
-       srx.append(val[-1])
+            #condition de covergence
+            if error_moy<0.1:
+               print(f"covergence attient a l'iteration {j+1}")
+               break 
+        #resultat final 
+        print("\n~~~~ Résultats finaux ~~~~")
+        for i,exemple in enumerate(x):
+           print(f"Exemple {i}: {exemple}, Cible: {srx[i]}, Prédiction: {predictions_courrent[i]:.6f}")   
+        
+
+            
+
+if __name__=="__main__":
+    reseau = MLP()
+    reseau.afficher_parametres()
+
+    #chargement des données
+    x=[]
+    srx=[]
+    with open ("data.txt","r") as file:
+      for l in file:
+        l=l.strip()
+        if l:
+           val =[float (num) for num in l.split()]# reading each entrees 
+           x.append(val[:-1])
+           srx.append(val[-1])
 
 x=np.array(x,dtype=np.float64)
 srx=np.array(srx)
-reseau.entrainement(reseau,x,srx)
+reseau.entrainement(x,srx)
 """
 #application de la fonction propagation avant 
 scx=[]
