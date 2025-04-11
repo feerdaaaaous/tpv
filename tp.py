@@ -160,7 +160,7 @@ class MLP:
         #resultat final 
         print("\n~~~~ Résultats finaux ~~~~")
         for i,exemple in enumerate(x):
-           print(f"Exemple {i}: {exemple}, Cible: {srx[i]}, Prédiction: {predictions_courrent[i]:.6f}")   
+           print(f"exemple {i}: {exemple}, sortie attendu: {srx[i]}  ,prédiction initial : {predicions_initail[i]} , prédiction : {predictions_courrent[i]:.6f}")   
         
 
             
