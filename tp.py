@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is for display the data full float numbers
 
 
@@ -81,43 +82,7 @@ class MLP:
         final_pred=self.propa_vers_avant(x)[0][0]
         print(f"end with iteration")
         return prediction,final_pred
-    """
-    def entrainement(self,x,srx,maxiter=10,epsilon=1e-6):
-        last_error=float('inf') #start with a large nbr of error 
-        # before training il faut calculer les sortie avant la retropropagation
-        sorties_avant=[]
-        for exemple in x:
-            xcolumn=np.array(exemple).reshape(-1,1)
-            sortie=reseau.propa_vers_avant(xcolumn)
-            sorties_avant.append(sortie)
-      
-        for _ in range (maxiter):
-            print(f"~~~~~~~~~~~~~~iteration {_+1}~~~~~~~~~~~~~~")
-            total_error=0
-            nbr_x=np.arange(len(x))
-            np.random.shuffle(nbr_x)
-            
-            xshuffle=x[nbr_x]
-            srxshuffle=srx[nbr_x]
-            sortie_avantshuffle= [sorties_avant[i] for i in nbr_x]
-            for i,exemple in enumerate(xshuffle):
-                xcolumn=np.array(exemple).reshape(-1,1)
-                sortie_avant=sortie_avantshuffle[i]
-                sortie_apres=reseau.retropropagation(xcolumn,srxshuffle[i],sortie_avant)
-                exemple_error=np.sum(np.abs(srxshuffle[i]-sortie_apres))
-                total_error+=exemple_error
-                
-                print(f"\nexemple {nbr_x[i]} => {exemple}")
-                print(f"sortie attendue = {srxshuffle[i]}")
-                print(f"sortie avant entraînement = {sortie_avant}")  # scx[i] was the output before training
-                print(f"sortie après entraînement = {sortie_apres}")
-                
-            if abs(last_error-total_error)<epsilon:
-                print(f"stopping earrly at iteration {_+1} with error = {total_error}")
-                break
-            last_error=total_error
-            print(f"iteration {_+1} total error = {total_error}")
-    """
+    
     def entrainement(self,x,srx,maxiter=50):
         predicions_initail={}
         predictions_courrent={}
@@ -126,6 +91,19 @@ class MLP:
             pred = self.propa_vers_avant(xcolumn)[0][0]#we did [0][0]par ce que la sortie est une matrice [[valeur]]
             predicions_initail[i] = pred
             predictions_courrent[i] = pred
+
+
+        #initialiser du meilleur modele
+        meilleur_erreur=float('inf')
+        meilleur_param={
+            'w1':self.w1.copy(),
+            'b1':self.w1.copy(),
+            'w2':self.w1.copy(),
+            'b2':self.w1.copy(),
+            'w3':self.w1.copy(),
+            'b3':self.w1.copy(),   
+        }
+
         for j in range (maxiter):
             print(f"~~~~~~~~~~~~~~iteration {j+1}~~~~~~~~~~~~~~")
             total_error=0
@@ -152,16 +130,47 @@ class MLP:
                 print(f"Sortie après mise à jour: {new_pred:.6f}")
             error_moy=total_error/len(x)
             print(f"\nEpoch {j+1} - Erreur moyenne: {error_moy:.6f}")
-
+            #sauvegarder le meilleur modéle 
+            if error_moy < meilleur_erreur:
+                meilleur_erreur=error_moy
+                meilleur_param={
+                  'w1':self.w1.copy(),
+                  'b1':self.w1.copy(),
+                  'w2':self.w1.copy(),
+                  'b2':self.w1.copy(),
+                  'w3':self.w1.copy(),
+                  'b3':self.w1.copy(),   
+                }
             #condition de covergence
             if error_moy<0.1:
                print(f"covergence attient a l'iteration {j+1}")
                break 
+        #save the best model
+        self.w1= meilleur_param['w1']
+        self.b1= meilleur_param['b1']
+        self.w2= meilleur_param['w2']
+        self.b2= meilleur_param['b2']
+        self.w3= meilleur_param['w3']
+        self.b3= meilleur_param['b3']
         #resultat final 
         print("\n~~~~ Résultats finaux ~~~~")
         for i,exemple in enumerate(x):
            print(f"exemple {i}: {exemple}, sortie attendu: {srx[i]}  ,prédiction initial : {predicions_initail[i]} , prédiction : {predictions_courrent[i]:.6f}")   
         
+    def savewandb (reseau,mon_fichier="poidsetbiais.pkl"):
+        poids_biais={
+            'w1':reseau.w1,
+            'b1':reseau.b1,
+            'w2':reseau.w2,
+            'b2':reseau.b2,
+            'w3':reseau.w3,
+            'b3':reseau.b3,
+        }
+        with open (mon_fichier,'wb') as f:
+            pickle.dump(poids_biais,f)
+        with open(mon_fichier, 'rb') as file:
+            data = pickle.load(file)
+        print(data)  
 
             
 
@@ -183,6 +192,35 @@ if __name__=="__main__":
 x=np.array(x,dtype=np.float64)
 srx=np.array(srx)
 reseau.entrainement(x,srx)
+reseau.savewandb("poidsetbiais.pkl")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 """
 #application de la fonction propagation avant 
 scx=[]
@@ -225,6 +263,43 @@ for i,exemple in enumerate(x):
     print(f"sortie attendue = {srx[i]}")
     print(f"sortie calcule = {sortie}")
 
+
+
+    def entrainement(self,x,srx,maxiter=10,epsilon=1e-6):
+        last_error=float('inf') #start with a large nbr of error 
+        # before training il faut calculer les sortie avant la retropropagation
+        sorties_avant=[]
+        for exemple in x:
+            xcolumn=np.array(exemple).reshape(-1,1)
+            sortie=reseau.propa_vers_avant(xcolumn)
+            sorties_avant.append(sortie)
+      
+        for _ in range (maxiter):
+            print(f"~~~~~~~~~~~~~~iteration {_+1}~~~~~~~~~~~~~~")
+            total_error=0
+            nbr_x=np.arange(len(x))
+            np.random.shuffle(nbr_x)
+            
+            xshuffle=x[nbr_x]
+            srxshuffle=srx[nbr_x]
+            sortie_avantshuffle= [sorties_avant[i] for i in nbr_x]
+            for i,exemple in enumerate(xshuffle):
+                xcolumn=np.array(exemple).reshape(-1,1)
+                sortie_avant=sortie_avantshuffle[i]
+                sortie_apres=reseau.retropropagation(xcolumn,srxshuffle[i],sortie_avant)
+                exemple_error=np.sum(np.abs(srxshuffle[i]-sortie_apres))
+                total_error+=exemple_error
+                
+                print(f"\nexemple {nbr_x[i]} => {exemple}")
+                print(f"sortie attendue = {srxshuffle[i]}")
+                print(f"sortie avant entraînement = {sortie_avant}")  # scx[i] was the output before training
+                print(f"sortie après entraînement = {sortie_apres}")
+                
+            if abs(last_error-total_error)<epsilon:
+                print(f"stopping earrly at iteration {_+1} with error = {total_error}")
+                break
+            last_error=total_error
+            print(f"iteration {_+1} total error = {total_error}")
 """
 
 
@@ -266,23 +341,6 @@ for i,exemple in enumerate(x):
 
 
 
-"""
-print(f"w1= \n {self.w1} \n b1= \n {self.b1}\n")
-print(f"w2=\n {self.w2}\n b2= \n {self.b2}\n")
-print(f"w3=\n {self.w3}\n b3= \n {self.b3}\n")
-#decalaration des variable (les entrées 3 )
-vars=np.array([[0.5],[0.2],[-0.3]])
-#x=no.random.randn(3,1)
-
-#propagation vers l'avant 
-c1=np.dot(w1,vars)+b1
-s1=sigmoid(c1) #matrice 3*1
-c2=np.dot(w2,s1)+b2
-s2=sigmoid(c2)#matrice 2*1
-c3=np.dot(w3,s2)+b3
-s=sigmoid(c3)
-print(f"sortie = {s}")
-"""
 
 
 
