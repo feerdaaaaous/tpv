@@ -5,7 +5,7 @@ np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is
 
 class MLP:
     def __init__(self):
-        self.alpha=0.1     #change to xavier initialization pour maintenir la meme variance des activation entre les diff couches 
+        self.alpha=0.1    
         self.w1 = np.random.randn(3, 3) 
         self.b1 = np.zeros((3, 1))
         # w1 et b1 est les poids et biais (couche entree  3 neurones)
@@ -41,7 +41,7 @@ class MLP:
 
         return self.s 
     
-    def retropropagation(self,x,s_reel,prediction,iteration=200):
+    def retropropagation(self,x,s_reel,prediction,iteration=100):
         
         
         for i in range(iteration):
@@ -84,12 +84,12 @@ class MLP:
         return prediction,final_pred
     
     def entrainement(self,x,srx,maxiter=50):
-        predicions_initail={}
+        predictions_initail={}
         predictions_courrent={}
         for i,exemple in enumerate(x):
             xcolumn = np.array(exemple).reshape(-1, 1)
             pred = self.propa_vers_avant(xcolumn)[0][0]#we did [0][0]par ce que la sortie est une matrice [[valeur]]
-            predicions_initail[i] = pred
+            predictions_initail[i] = pred
             predictions_courrent[i] = pred
 
 
@@ -116,20 +116,20 @@ class MLP:
 
                 xcolumn=np.array(exemple).reshape(-1,1)
                 pred_before=predictions_courrent[ex]#pour voir le pred before start every iteration ( affichage )
-                _,new_pred=self.retropropagation(xcolumn,sortie,pred,iteration=20)
+                _,new_pred=self.retropropagation(xcolumn,sortie,pred,iteration=100)
 
                 predictions_courrent[ex]=new_pred #stocker new prediction de chaque exemple a chaque iteration 
                 #calcule error total 
                 error=abs(sortie-new_pred)
                 total_error+=error
                 #affichage des calcules de chaque exemple 
-                print(f"\nExemple {ex}: {exemple}")
-                print(f"Sortie attendue: {sortie}")
-                print(f"Sortie initiale: {predicions_initail[ex]:.6f}")
-                print(f"Sortie avant mise à jour: {pred_before:.6f}")
-                print(f"Sortie après mise à jour: {new_pred:.6f}")
+                print(f"\nexemple {ex}: {exemple}")
+                print(f"sortie attendue: {sortie}")
+                print(f"sortie initiale: {predictions_initail[ex]:.6f}")
+                print(f"sortie avant mise à jour: {pred_before:.6f}")
+                print(f"sortie après mise à jour: {new_pred:.6f}")
             error_moy=total_error/len(x)
-            print(f"\nEpoch {j+1} - Erreur moyenne: {error_moy:.6f}")
+            print(f"\niteration{j+1} - erreur moyenne: {error_moy:.6f}")
             #sauvegarder le meilleur modéle 
             if error_moy < meilleur_erreur:
                 meilleur_erreur=error_moy
@@ -155,7 +155,7 @@ class MLP:
         #resultat final 
         print("\n~~~~ Résultats finaux ~~~~")
         for i,exemple in enumerate(x):
-           print(f"exemple {i}: {exemple}, sortie attendu: {srx[i]}  ,prédiction initial : {predicions_initail[i]} , prédiction : {predictions_courrent[i]:.6f}")   
+           print(f"exemple {i}: {exemple}, sortie attendu: {srx[i]}  ,prédiction initial : {predictions_initail[i]} , prédiction : {predictions_courrent[i]:.6f}")   
         
     def savewandb (self,mon_fichier="poidsetbiais.pkl"):
         poids_biais={
