@@ -54,49 +54,39 @@ class MLPXOR:
         print(f"end with iteration")
         return prediction,final_pred
 
-    def entrainement(self,x,y,maxiter=50):
-        prediction_initial=[self.propa_vers_avant(np.array(i).reshape(-1,1))[0][0] for i in x]
-        prediction_courrent=prediction_initial.copy()
-        for j in range (maxiter):
-            print(f"~~~~~~iteration {j+1}")
+    def entrainement(self,X,Y,maxiter=1000):
+        for i in range (maxiter):
             total_error=0
-            nbr_x=np.arange(len(x))
-            np.random.shuffle(nbr_x)
-            for ex in nbr_x:
-                exemple=x[ex]
-                sortie = y[ex]
-                xcolumn=np.array(exemple).reshape(-1,1)
-                pred_before=prediction_courrent[ex]
-                _,new_pred=self.retropropagation(xcolumn,sortie,pred_before,iteration=150)
-                prediction_courrent[ex]=new_pred
-
-                error=abs(sortie-new_pred)
+            for x,y_reel in zip(X,Y):
+                x=x.reshape(-1,1)
+                y_reel=np.array([[y_reel]])
+                prediction=self.propa_vers_avant(x)
+                self.retropropagation(x,y_reel,prediction,iteration=150)
+                y_pred=self.propa_vers_avant(x)
+                error=abs(y_reel-y_pred)
                 total_error+= error
-                print(f"\nExemple {ex}: {exemple}")
-                print(f"Sortie attendue       : {sortie}")
-                print(f"Prédiction initiale   : {prediction_initial[ex]:.6f}")
-                print(f"Sortie avant mise à jour : {pred_before:.6f}")
-                print(f"Sortie après mise à jour : {new_pred:.6f}")
-                error_moy = total_error / len(x)
-            print(f"\nIteration {j+1} - Erreur moyenne: {error_moy:.6f}")
-            if error_moy < 0.1:
-                print(f"\n>>> Convergence atteinte à l'itération {j+1}")
+                
+            
+            if total_error < 0.01:
+                print(f"\n>>> convergence atteinte à l'itération {i+1}")
                 break
         # Résultats finaux
-        print("\n~~~~ Résultats finaux ~~~~")
-        for i, exemple in enumerate(x):
-            print(f"Exemple {i}: {exemple}, Sortie attendue: {y[i]}  , "
-                  f"Prédiction initiale : {prediction_initial[i]:.6f} , "
-                  f"Prédiction finale : {prediction_courrent[i]:.6f}")
-    def tester(self, x ,y):
-        for i,(x,y) in enumerate(zip(X,y)):
+        print("\n~~~~ résultats finaux ~~~~")
+        for i ,(x,y_true) in enumerate(zip(X,Y)):
             x=x.reshape(-1,1)
-            prediction=self.propa_vers_avant(x)[0][0]
-            print(f"input{i+1}:{x} sortie attendue = {y} prediction {prediction}")
+            y_pred=self.propa_vers_avant(x)[0][0]
+            print(f"exemple {i}: entrée: {x.ravel()}, sortie attendue: {y_true}, Prédiction finale: {y_pred:.6f}")
+
+    def tester(self, x ,y):
+        for i,(xi,yi) in enumerate(zip(x,y)):
+            xi=xi.reshape(-1,1)
+            prediction=self.propa_vers_avant(xi)[0][0]
+            print(f"input{i+1}:{xi.ravel()} sortie attendue = {yi} prediction {prediction}")
             
 if __name__=="__main__":
-    reseau=MLPXOR()
-    X=np.array([[0,0],[0,1],[1,0],[1,1]],dtype=np.float64)
+   
+    X=np.array([[0,0],[0,1],[1,0],[1,1]],dtype=np.float64) 
     Y=np.array([0,1,1,0],dtype=np.float64)
+    reseau=MLPXOR()
     reseau.entrainement(X,Y)
     reseau.tester(X,Y)

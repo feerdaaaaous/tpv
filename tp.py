@@ -153,7 +153,7 @@ class MLP:
         self.w3= meilleur_param['w3']
         self.b3= meilleur_param['b3']
         #resultat final 
-        print("\n~~~~ Résultats finaux ~~~~")
+        print("\n~~~~ résultats finaux ~~~~")
         for i,exemple in enumerate(x):
            print(f"exemple {i}: {exemple}, sortie attendu: {srx[i]}  ,prédiction initial : {predictions_initail[i]} , prédiction : {predictions_courrent[i]:.6f}")   
         
