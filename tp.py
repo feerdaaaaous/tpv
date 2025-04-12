@@ -5,7 +5,7 @@ np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is
 
 class MLP:
     def __init__(self):
-        self.alpha=0.5        #change to xavier initialization pour maintenir la meme variance des activation entre les diff couches 
+        self.alpha=0.1     #change to xavier initialization pour maintenir la meme variance des activation entre les diff couches 
         self.w1 = np.random.randn(3, 3) 
         self.b1 = np.zeros((3, 1))
         # w1 et b1 est les poids et biais (couche entree  3 neurones)
@@ -41,7 +41,7 @@ class MLP:
 
         return self.s 
     
-    def retropropagation(self,x,s_reel,prediction,iteration=100):
+    def retropropagation(self,x,s_reel,prediction,iteration=200):
         
         
         for i in range(iteration):
@@ -172,6 +172,24 @@ class MLP:
             data = pickle.load(file)
         print(data)  
 
+    def validation (self,x,srx):
+        correcte_pred=0
+        for i,exemple in enumerate(x):
+            xcolumn = np.array(exemple).reshape(-1,1)
+            pred=self.propa_vers_avant(xcolumn)[0][0]
+            reel=srx[i]
+            print(f"exemple {i+1} -> {exemple} -> sortie attendue ={reel}-> prediction ={pred:.6f}")
+            if np.isclose(pred,reel,atol=0.1):
+                correcte_pred+=1
+                print(f"~~~~~~~~~~correcte prediction de exemple {i+1}")
+            else:
+                print(f"~~~~~~~~~~incorrecte prediction de exemple {i+1}")
+            
+        pourcentage=correcte_pred/len(x)*100
+        print(f"peurcentage = {pourcentage}%")
+        print(f"nbr exemple correcte {correcte_pred}")
+
+
             
 
 if __name__=="__main__":
@@ -192,7 +210,19 @@ if __name__=="__main__":
 x=np.array(x,dtype=np.float64)
 srx=np.array(srx)
 reseau.entrainement(x,srx)
-reseau.savewandb("poidsetbiais.pkl")
+#reseau.savewandb("poidsetbiais.pkl")
+xv=[]
+srxv=[]
+with open ( "validation.txt","r") as file:
+    for l in file:
+        l=l.strip()
+        if l:
+            val=[float(num) for num in l.split()]
+            xv.append(val[:-1])
+            srxv.append(val[-1])
+xv=np.array(xv,dtype=np.float64)
+srxv=np.array(srxv)
+reseau.validation(xv,srxv)
 
 
 
