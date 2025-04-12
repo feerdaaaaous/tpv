@@ -97,11 +97,11 @@ class MLP:
         meilleur_erreur=float('inf')
         meilleur_param={
             'w1':self.w1.copy(),
-            'b1':self.w1.copy(),
-            'w2':self.w1.copy(),
-            'b2':self.w1.copy(),
-            'w3':self.w1.copy(),
-            'b3':self.w1.copy(),   
+            'b1':self.b1.copy(),
+            'w2':self.w2.copy(),
+            'b2':self.b2.copy(),
+            'w3':self.w3.copy(),
+            'b3':self.b3.copy(),   
         }
 
         for j in range (maxiter):
@@ -135,11 +135,11 @@ class MLP:
                 meilleur_erreur=error_moy
                 meilleur_param={
                   'w1':self.w1.copy(),
-                  'b1':self.w1.copy(),
-                  'w2':self.w1.copy(),
-                  'b2':self.w1.copy(),
-                  'w3':self.w1.copy(),
-                  'b3':self.w1.copy(),   
+                  'b1':self.b1.copy(),
+                  'w2':self.w2.copy(),
+                  'b2':self.b2.copy(),
+                  'w3':self.w3.copy(),
+                  'b3':self.b3.copy(),   
                 }
             #condition de covergence
             if error_moy<0.1:
@@ -157,7 +157,7 @@ class MLP:
         for i,exemple in enumerate(x):
            print(f"exemple {i}: {exemple}, sortie attendu: {srx[i]}  ,prédiction initial : {predicions_initail[i]} , prédiction : {predictions_courrent[i]:.6f}")   
         
-    def savewandb (reseau,mon_fichier="poidsetbiais.pkl"):
+    def savewandb (self,mon_fichier="poidsetbiais.pkl"):
         poids_biais={
             'w1':reseau.w1,
             'b1':reseau.b1,
