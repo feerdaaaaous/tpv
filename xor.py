@@ -2,7 +2,7 @@ import numpy as np
 
 class MLPXOR:
     def __init__(self):
-        self.alpha=0.5 
+        self.alpha=0.1
         # w and b couche entree and cachéé
         self.w1 = np.random.randn(2, 2) 
         self.b1 = np.zeros((2, 1))
