@@ -5,7 +5,7 @@ np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is
 
 class MLP:
     def __init__(self):
-        self.alpha=0.1    
+        self.alpha=0.5    
         self.w1 = np.random.randn(3, 3) 
         self.b1 = np.zeros((3, 1))
         # w1 et b1 est les poids et biais (couche entree  3 neurones)
@@ -41,7 +41,7 @@ class MLP:
 
         return self.s 
     
-    def retropropagation(self,x,s_reel,prediction,iteration=100):
+    def retropropagation(self,x,s_reel,prediction,iteration=1000):
         
         
         for i in range(iteration):
@@ -83,7 +83,7 @@ class MLP:
         print(f"end with iteration")
         return prediction,final_pred
     
-    def entrainement(self,x,srx,maxiter=50):
+    def entrainement(self,x,srx,maxiter=500):
         predictions_initail={}
         predictions_courrent={}
         for i,exemple in enumerate(x):
@@ -116,7 +116,7 @@ class MLP:
 
                 xcolumn=np.array(exemple).reshape(-1,1)
                 pred_before=predictions_courrent[ex]#pour voir le pred before start every iteration ( affichage )
-                _,new_pred=self.retropropagation(xcolumn,sortie,pred,iteration=100)
+                _,new_pred=self.retropropagation(xcolumn,sortie,pred,iteration=1000)
 
                 predictions_courrent[ex]=new_pred #stocker new prediction de chaque exemple a chaque iteration 
                 #calcule error total 
