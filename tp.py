@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import matplotlib.pyplot as plt
 np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is for display the data full float numbers
 
 
@@ -174,9 +175,11 @@ class MLP:
 
     def validation (self,x,srx):
         correcte_pred=0
+        predictions=[]
         for i,exemple in enumerate(x):
             xcolumn = np.array(exemple).reshape(-1,1)
             pred=self.propa_vers_avant(xcolumn)[0][0]
+            predictions.append(pred)
             reel=srx[i]
             print(f"exemple {i+1} -> {exemple} -> sortie attendue ={reel}-> prediction ={pred:.6f}")
             if np.isclose(pred,reel,atol=0.1):
@@ -188,10 +191,35 @@ class MLP:
         pourcentage=correcte_pred/len(x)*100
         print(f"peurcentage = {pourcentage}%")
         print(f"nbr exemple correcte {correcte_pred}")
+        return np.array(predictions),pourcentage
+    
+    def visualisation( self,x,srx,predictions,pourcentage,threshold=0.5,filename="visualisation.png"):
+        fig = plt.figure(figsize=(12, 10))
+        ax = fig.add_subplot(111, projection='3d')
+        binary_predictions = (predictions > threshold).astype(int)
+        vase_correct = np.where((binary_predictions == 1 )& (srx==1))[0]
+        vase_incorrect = np.where((binary_predictions == 1) & (srx == 0))[0]
+        nonvase_correct = np.where((binary_predictions == 0) & (srx == 0))[0]
+        nonvase_incorrect = np.where((binary_predictions == 0) & (srx == 1))[0]
+        ax.scatter(x[vase_correct, 0], x[vase_correct, 1], x[vase_correct, 2],c='green', marker='o',s=10, label='vase correctement prédit',alpha=0.7)
+        ax.scatter(x[vase_incorrect, 0], x[vase_incorrect, 1], x[vase_incorrect, 2],c='green', marker='o',s=10, label='vase incorrectement prédit',alpha=0.7)
+        ax.scatter(x[nonvase_correct, 0], x[nonvase_correct, 1], x[nonvase_correct, 2],c='green', marker='o',s=10, label='nonvase correctement prédit',alpha=0.7)
+        ax.scatter(x[nonvase_incorrect, 0], x[nonvase_incorrect, 1], x[nonvase_incorrect, 2],c='green', marker='o',s=10, label='nonvase incorrectement prédit',alpha=0.7)
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        ax.set_title('Classification des points du vase 3D') 
+        plt.title(f"{pourcentage:.2f}%")    
+        ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1))    
+        ax.set_xlim(-3, 3)
+        ax.set_ylim(-3, 3)
+        ax.set_zlim(0, 7) 
+        ax.grid(True)
+        ax.view_init(elev=20, azim=30)
 
-
-            
-
+        plt.tight_layout()
+        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        
 if __name__=="__main__":
     reseau = MLP()
     reseau.afficher_parametres()
@@ -210,19 +238,10 @@ if __name__=="__main__":
 x=np.array(x,dtype=np.float64)
 srx=np.array(srx)
 reseau.entrainement(x,srx)
-#reseau.savewandb("poidsetbiais.pkl")
-xv=[]
-srxv=[]
-with open ( "data.txt","r") as file:
-    for l in file:
-        l=l.strip()
-        if l:
-            val=[float(num) for num in l.split()]
-            xv.append(val[:-1])
-            srxv.append(val[-1])
-xv=np.array(xv,dtype=np.float64)
-srxv=np.array(srxv)
-reseau.validation(xv,srxv)
+reseau.savewandb("poidsetbiais.pkl")
+predictions,pourcentage=reseau.validation(x,srx)
+reseau.visualisation(x,srx,predictions,pourcentage)
+
 
 
 
