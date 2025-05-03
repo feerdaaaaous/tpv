@@ -5,7 +5,7 @@ np.set_printoptions(threshold=np.inf, floatmode='unique', suppress=True)#this is
 
 class MLP:
     def __init__(self):
-        self.alpha=0.5    
+        self.alpha=0.5  
         self.w1 = np.random.randn(3, 3) 
         self.b1 = np.zeros((3, 1))
         # w1 et b1 est les poids et biais (couche entree  3 neurones)
@@ -41,7 +41,7 @@ class MLP:
 
         return self.s 
     
-    def retropropagation(self,x,s_reel,prediction,iteration=1000):
+    def retropropagation(self,x,s_reel,prediction,iteration=2000):
         
         
         for i in range(iteration):
@@ -83,7 +83,7 @@ class MLP:
         print(f"end with iteration")
         return prediction,final_pred
     
-    def entrainement(self,x,srx,maxiter=500):
+    def entrainement(self,x,srx,maxiter=100):
         predictions_initail={}
         predictions_courrent={}
         for i,exemple in enumerate(x):
@@ -213,7 +213,7 @@ reseau.entrainement(x,srx)
 #reseau.savewandb("poidsetbiais.pkl")
 xv=[]
 srxv=[]
-with open ( "validation.txt","r") as file:
+with open ( "data.txt","r") as file:
     for l in file:
         l=l.strip()
         if l:
