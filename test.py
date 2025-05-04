@@ -19,14 +19,12 @@ class MLP:
         self.s2 = self.sigmoid(self.c2)
         self.c3 = np.dot(self.w3, self.s2) + self.b3
         self.s = self.sigmoid(self.c3)
-        if np.isclose(self.s,1,atol=0.1):
+        if self.s < 0.5:
+            return 0
+        else:
             return 1
-        if np.isclose(self.s,0,atol=0.1):
-            return 0
-        elif not np.isclose(self.s, 1, atol=0.1):
-            return 0
-        elif not np.isclose(self.s, 0, atol=0.1):
-            return 1 
+
+        
         
 def load_params(mlp,file):
     with open(file,'rb') as f:
