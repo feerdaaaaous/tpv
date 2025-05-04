@@ -23,7 +23,10 @@ class MLP:
             return 1
         if np.isclose(self.s,0,atol=0.1):
             return 0
-        return 0 
+        elif not np.isclose(self.s, 1, atol=0.1):
+            return 0
+        elif not np.isclose(self.s, 0, atol=0.1):
+            return 1 
         
 def load_params(mlp,file):
     with open(file,'rb') as f:
@@ -51,4 +54,4 @@ def main():
     with open("data.txt","w") as file :
         file.writelines(results)
 if __name__ == "__main__":
-    main()
+    main()    
