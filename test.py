@@ -39,7 +39,7 @@ def main():
     mlp=MLP()
     load_params(mlp,"poidsetbiaisff.pkl")
     results=[]
-    with open("data.txt","r")as file :
+    with open("test.txt","r")as file :
         for l in file:
             l=l.strip()
             if l:
@@ -49,7 +49,7 @@ def main():
                 r=' '.join(map(str,input))+f' {output}\n'
                 results.append(r)
                
-    with open("data.txt","w") as file :
+    with open("test_ferdaous.txt","w") as file :
         file.writelines(results)
 if __name__ == "__main__":
     main()    
