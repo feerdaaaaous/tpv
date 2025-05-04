@@ -31,7 +31,7 @@ def load_params(mlp,file):
         mlp.b3=data['b3']
 def main():
     mlp=MLP()
-    load_params(mlp,"poidsetbiais.pkl")
+    load_params(mlp,"poidsetbiaisff.pkl")
     results=[]
     with open("datatest.txt","r")as file :
         for l in file:
@@ -39,9 +39,14 @@ def main():
             if l:
                 val=[float(num) for num in l.split()]
                 input = val [:3]
+                
                 output=mlp.propa_vers_avant(input)
-                r=' '.join(map(str,input))+f' {output:.6f}\n'
-                results.append(r)
+                if np.isclose(output,1,atol=0.1):
+                   r=' '.join(map(str,input))+f' {1}\n'
+                   results.append(r)
+                if np.isclose(output,0,atol=0.1):
+                    r=' '.join(map(str,input))+f' {0}\n'
+                    results.append(r)
     with open("datatest.txt","w") as file :
         file.writelines(results)
 if __name__ == "__main__":

@@ -158,7 +158,7 @@ class MLP:
         for i,exemple in enumerate(x):
            print(f"exemple {i}: {exemple}, sortie attendu: {srx[i]}  ,prédiction initial : {predictions_initail[i]} , prédiction : {predictions_courrent[i]:.6f}")   
         
-    def savewandb (self,mon_fichier="poidsetbiais.pkl"):
+    def savewandb (self,mon_fichier):
         poids_biais={
             'w1':reseau.w1,
             'b1':reseau.b1,
@@ -193,7 +193,7 @@ class MLP:
         print(f"nbr exemple correcte {correcte_pred}")
         return np.array(predictions),pourcentage
     
-    def visualisation( self,x,srx,predictions,pourcentage,threshold=0.5,filename="visualisation.png"):
+    def visualisation( self,x,srx,predictions,pourcentage,threshold=0.5,filename="visualisationt.png"):
         fig = plt.figure(figsize=(12, 10))
         ax = fig.add_subplot(111, projection='3d')
         binary_predictions = (predictions > threshold).astype(int)
@@ -238,7 +238,7 @@ if __name__=="__main__":
 x=np.array(x,dtype=np.float64)
 srx=np.array(srx)
 reseau.entrainement(x,srx)
-reseau.savewandb("poidsetbiais.pkl")
+reseau.savewandb("poidsetbiaist.pkl")
 predictions,pourcentage=reseau.validation(x,srx)
 reseau.visualisation(x,srx,predictions,pourcentage)
 
