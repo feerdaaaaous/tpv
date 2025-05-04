@@ -20,9 +20,9 @@ class MLP:
         self.c3 = np.dot(self.w3, self.s2) + self.b3
         self.s = self.sigmoid(self.c3)
         if np.isclose(self.s,1,atol=0.1):
-            return self.s.item()
+            return 1
         if np.isclose(self.s,0,atol=0.1):
-            return self.s.item()
+            return 0
         return 0 
         
 def load_params(mlp,file):
@@ -48,7 +48,7 @@ def main():
                 r=' '.join(map(str,input))+f' {output}\n'
                 results.append(r)
                
-    with open("datatest.txt","w") as file :
+    with open("data.txt","w") as file :
         file.writelines(results)
 if __name__ == "__main__":
     main()
