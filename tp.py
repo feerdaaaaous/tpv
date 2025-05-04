@@ -202,9 +202,9 @@ class MLP:
         nonvase_correct = np.where((binary_predictions == 0) & (srx == 0))[0]
         nonvase_incorrect = np.where((binary_predictions == 0) & (srx == 1))[0]
         ax.scatter(x[vase_correct, 0], x[vase_correct, 1], x[vase_correct, 2],c='green', marker='o',s=10, label='vase correctement prédit',alpha=0.7)
-        ax.scatter(x[vase_incorrect, 0], x[vase_incorrect, 1], x[vase_incorrect, 2],c='green', marker='o',s=10, label='vase incorrectement prédit',alpha=0.7)
-        ax.scatter(x[nonvase_correct, 0], x[nonvase_correct, 1], x[nonvase_correct, 2],c='green', marker='o',s=10, label='nonvase correctement prédit',alpha=0.7)
-        ax.scatter(x[nonvase_incorrect, 0], x[nonvase_incorrect, 1], x[nonvase_incorrect, 2],c='green', marker='o',s=10, label='nonvase incorrectement prédit',alpha=0.7)
+        ax.scatter(x[vase_incorrect, 0], x[vase_incorrect, 1], x[vase_incorrect, 2],c='red', marker='o',s=10, label='vase incorrectement prédit',alpha=0.7)
+        ax.scatter(x[nonvase_correct, 0], x[nonvase_correct, 1], x[nonvase_correct, 2],c='lightgreen', marker='o',s=10, label='nonvase correctement prédit',alpha=0.7)
+        ax.scatter(x[nonvase_incorrect, 0], x[nonvase_incorrect, 1], x[nonvase_incorrect, 2],c='lightcoral', marker='o',s=10, label='nonvase incorrectement prédit',alpha=0.7)
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
