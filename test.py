@@ -19,7 +19,12 @@ class MLP:
         self.s2 = self.sigmoid(self.c2)
         self.c3 = np.dot(self.w3, self.s2) + self.b3
         self.s = self.sigmoid(self.c3)
-        return self.s.item()
+        if np.isclose(self.s,1,atol=0.1):
+            return self.s.item()
+        if np.isclose(self.s,0,atol=0.1):
+            return self.s.item()
+        return 0 
+        
 def load_params(mlp,file):
     with open(file,'rb') as f:
         data=pickle.load(f)
@@ -33,20 +38,16 @@ def main():
     mlp=MLP()
     load_params(mlp,"poidsetbiaisff.pkl")
     results=[]
-    with open("datatest.txt","r")as file :
+    with open("data.txt","r")as file :
         for l in file:
             l=l.strip()
             if l:
                 val=[float(num) for num in l.split()]
                 input = val [:3]
-                
                 output=mlp.propa_vers_avant(input)
-                if np.isclose(output,1,atol=0.1):
-                   r=' '.join(map(str,input))+f' {1}\n'
-                   results.append(r)
-                if np.isclose(output,0,atol=0.1):
-                    r=' '.join(map(str,input))+f' {0}\n'
-                    results.append(r)
+                r=' '.join(map(str,input))+f' {output}\n'
+                results.append(r)
+               
     with open("datatest.txt","w") as file :
         file.writelines(results)
 if __name__ == "__main__":
